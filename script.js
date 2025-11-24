@@ -7,11 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hamburger.addEventListener('click', () => {
         navLinks.classList.toggle('active');
-        hamburger.classList.toggle('fa-times'); // Changes bars to X
+        hamburger.classList.toggle('fa-times');
         hamburger.classList.toggle('fa-bars');
     });
 
-    // Close menu when clicking a link
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             navLinks.classList.remove('active');
@@ -20,34 +19,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Scroll Animations (Intersection Observer) ---
+    // --- Dynamic Year ---
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- Scroll Animations ---
     const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.1 // Trigger a bit earlier
+        threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target); // Run once
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    const fadeElements = document.querySelectorAll('.fade-in');
-    fadeElements.forEach(el => observer.observe(el));
+    // Apply animation classes logic via JS to keep HTML clean
+    const animatedElements = document.querySelectorAll('.skill-box, .timeline-card, .project-card, .contact-wrapper');
+    animatedElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'all 0.6s ease-out';
+        observer.observe(el);
+    });
 
-    // --- Navbar Background Scroll Effect ---
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.4)";
-            navbar.style.background = "rgba(2, 6, 23, 0.95)";
-        } else {
-            navbar.style.boxShadow = "none";
-            navbar.style.background = "rgba(15, 23, 42, 0.85)";
-        }
+    // --- Form Handling (Mock) ---
+    const form = document.getElementById('contactForm');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('.submit-btn');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+            btn.style.background = '#2ecc71'; // Success Green
+            form.reset();
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = ''; // Reset
+            }, 3000);
+        }, 1500);
     });
 });
